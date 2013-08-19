@@ -16,3 +16,6 @@
 [submodule "bundle/gundo"]
 	path = bundle/gundo
 	url = https://github.com/sjl/gundo.vim.git
+[submodule "bundle/NERDTree"]
+	path = bundle/NERDTree
+	url = https://github.com/scrooloose/nerdtree.git

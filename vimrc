@@ -1,6 +1,7 @@
 " Last updated 07/31/2013
 
 " External Plugins ==========================================================
+runtime bundle/pathogen/autoload/pathogen.vim
 execute pathogen#infect()
 execute pathogen#helptags()
 syntax on

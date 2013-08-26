@@ -67,6 +67,7 @@ set titlestring=%t%(\ %M%)%(\ -\ (%{expand(\"%:p\")})%)%(\ %a%)\ -\ %{hostname()
 set title										" Put the filename in the window title
 set noautochdir									" Don't change the working directory (Needed for some plugins)
 set pastetoggle=<F5>							" Toggle pastemode
+highlight LineNr ctermfg=grey					" Make line numbers Grey instead of Yellow
 
 
 

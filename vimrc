@@ -1,17 +1,17 @@
-" Last updated 07/31/2013
+" Last updated 10/30/2014
+
+" Compatability Issues
+set nocompatible								" Use vim defaults, not old vi defaults
+set backspace=indent,eol,start					" Allows backspace to work in a sane manner
 
 " External Plugins ==========================================================
-runtime bundle/pathogen/autoload/pathogen.vim
+runtime bundle/vim-pathogen/autoload/pathogen.vim
 execute pathogen#infect()
 execute pathogen#helptags()
 syntax on
 filetype plugin indent on
 
 " Personal Settings =========================================================
-
-" Compatability Issues
-set nocompatible								" Use vim defaults, not old vi defaults
-set backspace=indent,eol,start					" Allows backspace to work in a sane manner
 
 
 " General Environment Options
@@ -84,22 +84,16 @@ nnoremap <silent> <Space> :nohlsearch<Bar>:echo<CR>
 inoremap jj <Esc>
 
 " Move up/down through wordwrapped lines
-nnoremap [A <C-Up>
-nnoremap [B <C-Down>
-nnoremap <C-Down> gj
-nnoremap <C-Up> gk
+nnoremap [B gj
+nnoremap [A gk
 nnoremap <C-j> gj
 nnoremap <C-k> gk
 
 " Bubble single lines
-nnoremap [C <C-Right>
-nnoremap [D <C-Left>
-nnoremap <C-Left> ddkP
-nnoremap <C-Right> ddp
+nnoremap [D ddkP
+nnoremap [C ddp
 
 " Bubble multiple lines
-vnoremap [C <C-Right>
-vnoremap [D <C-Left>
 vnoremap <C-Left> xkP`[V`]
 vnoremap <C-Right> xp`[V`]
 
@@ -111,7 +105,7 @@ inoremap <F6> <ESC>:set invnumber<CR>i
 cabbr <expr> %% expand('%:p:h')
 
 " One Key JSBeautify
-nnoremap <F12> :%!js-beautify -j -q -B -f -<CR>
+nnoremap <F12> :%!js-beautify -j -q -f -<CR>
 
 " Allow numeric keypad to work like it should
 inoremap <Esc>OQ /
@@ -164,8 +158,8 @@ function! PluginChecks()
 		nmap <F4>  :SyntasticCheck<CR>:Errors<CR>
 		nmap <F9>  :lnext<CR>
 		nmap <F10> :lprevious<CR>
+		let g:syntastic_javascript_checkers=['jslint']
 	endif
-
 
 	" NERDTree
 	if exists(":NERDTreeToggle")
@@ -184,33 +178,36 @@ endfunction
 "
 function! UglyPrePost()
 	let filebase = substitute(expand('%:p'), '.json','','')
-	let prebuild = filebase . '-preBuild.js'
-	let postbuild = filebase . '-postBuild.js'
-	let upline = getline((line(".") - 1))
-	let thefile = ''
+	let preline = searchpos('preBuild')[0]
+	let postline = searchpos('postBuild')[0]
+	let builds = []
 	if &filetype == 'javascript'
-		
-		if upline =~ '^\s\{-}"preBuild'
-			let thefile = prebuild
-		elseif upline =~ '^\s\{-}"postBuild'
-			let thefile = postbuild
+		if preline > 0
+			call add(builds, 'preBuild')
 		endif
-
-		if filereadable(thefile)
-			let output = '"' . system('command -v uglifyjs >/dev/null && uglifyjs ' . thefile . ' | sed -r -e ''s/("##|##")/##/g'' -e ''s/"/\x27/g''') . '"'
-			if output != '""'
-				normal d$
-				put = output
-				normal kJ
-				redraw!
-				echo 'Successfully Uglified ' . thefile
+		if postline > 0
+			call add(builds, 'postBuild')
+		endif
+		for mybuild in builds
+			let myfile = filebase . '-' . mybuild . '.js'
+			if filereadable(myfile)
+				let output = '"multi": "' . system('command -v uglifyjs >/dev/null && uglifyjs -nc ' . myfile . ' | sed -r -e ''s/("##|##")/##/g'' -e ''s/"/\x27/g'' -e ''s/&/\\&/g''') . '"'
+				if output != '"multi": ""'
+					echom output
+					let myline = getline(searchpos(mybuild)[0]+1)
+					if myline =~ '^\s\{-}"multi'
+						call setline(searchpos(mybuild)[0]+1, substitute(myline, '\"multi\":.*', output, ''))
+						echo 'Successfully Uglified ' . myfile
+					else
+						echom 'Error: No line with "multi" found beneath a pre or post build.'
+					endif
+				else
+					echom 'Error: Looks like uglifyjs is not in your path' 
+				endif
 			else
-				echom 'Error: Looks like uglifyjs is not in your path' 
+				echom 'Error: Could not read file: (' . myfile .')'
 			endif
-		else
-			echom 'Error: Could not read file: (' . thefile .')'
-		endif
-
+		endfor
 	else
 		echom 'Error: Filetype is not Javascript'
 	endif

@@ -5,13 +5,17 @@ set nocompatible								" Use vim defaults, not old vi defaults
 set backspace=indent,eol,start					" Allows backspace to work in a sane manner
 
 " External Plugins ==========================================================
-runtime bundle/vim-pathogen/autoload/pathogen.vim
+runtime bundle/pathogen/autoload/pathogen.vim
 execute pathogen#infect()
 execute pathogen#helptags()
 syntax on
 filetype plugin indent on
 
 " Personal Settings =========================================================
+
+
+" Filetype Declarations
+autocmd BufNewFile,BufRead *.json set ft=javascript
 
 
 " General Environment Options
@@ -191,7 +195,7 @@ function! UglyPrePost()
 		for mybuild in builds
 			let myfile = filebase . '-' . mybuild . '.js'
 			if filereadable(myfile)
-				let output = '"multi": "' . system('command -v uglifyjs >/dev/null && uglifyjs -nc ' . myfile . ' | sed -r -e ''s/("##|##")/##/g'' -e ''s/"/\x27/g'' -e ''s/&/\\&/g''') . '"'
+				let output = '"multi": "' . system('command -v uglifyjs >/dev/null && uglifyjs ' . myfile . ' -mc negate_iife=false | sed -r -e ''s/("##|##")/##/g'' -e ''s/"/\x27/g'' -e ''s/&/\\&/g''') . '"'
 				if output != '"multi": ""'
 					echom output
 					let myline = getline(searchpos(mybuild)[0]+1)

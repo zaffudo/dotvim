@@ -1,4 +1,4 @@
-" Last updated 10/30/2014
+" Last updated 01/20/2015
 
 " Compatability Issues
 set nocompatible								" Use vim defaults, not old vi defaults
@@ -12,7 +12,6 @@ syntax on
 filetype plugin indent on
 
 " Personal Settings =========================================================
-
 
 " Filetype Declarations
 autocmd BufNewFile,BufRead *.json set ft=javascript

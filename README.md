@@ -18,7 +18,7 @@ Hyperbole aside, this is my VIM configuration folder. There are many like it, bu
 Or, consider making this part of a larger 'dotfiles' directory, and keep all your configs in one 
 place like so: https://github.com/zaffudo/dotfiles
 
-###For More Info
+### For More Info
 Feel free to use/steal from this as you see fit. If you're really looking to take your VIM use to
 the next level, I suggest checking out vimcasts. I wish I was as good at anything, as that dude is
 at VIM:
